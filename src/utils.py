@@ -6,9 +6,6 @@ import polars as pl
 from retrying import retry
 from typing import List
 
-from dotenv import load_dotenv
-
-
 
 def read_parquet(url: str):
     df = pl.read_parquet(url).to_pandas().drop('__index_level_0__', axis=1, errors='ignore')
