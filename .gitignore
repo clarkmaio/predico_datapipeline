@@ -1,0 +1,4 @@
+.vscode
+.secret
+*.pyc
+**/__pycache__
