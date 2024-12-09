@@ -2,7 +2,6 @@ polars
 pandas
 tqdm
 huggingface_hub
-python-dotenv
 fsspec
 s3fs
 xarray

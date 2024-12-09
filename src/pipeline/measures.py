@@ -4,15 +4,11 @@ import pandas as pd
 from datetime import datetime
 from tqdm import tqdm
 from huggingface_hub import login
-from dotenv import load_dotenv
 import os
 
 from src.utils import upload_dataframe_hf
 
-
-
 URL_LIVE = 'https://opendata.elia.be/api/explore/v2.1/catalog/datasets/ods086/exports/json?limit=-1&timezone=UTC&use_labels=false&epsg=4326&refine=region%3A%22Federal%22'
-SECRET = load_dotenv('.secret')
 
 
 def load_realtime_measures():

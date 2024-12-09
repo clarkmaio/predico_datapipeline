@@ -10,11 +10,9 @@ import os
 from huggingface_hub import login
 from typing import List, Iterable
 from copy import deepcopy
-from dotenv import load_dotenv
 
 from utils import upload_dataframe_hf
 
-SECRET = load_dotenv('.secret')
 
 
 def uri_generator(forecastdate: datetime, run: str, step: int) -> str:
