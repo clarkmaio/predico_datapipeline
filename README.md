@@ -1,4 +1,4 @@
-# Predico Pipeline
+# Predico Data Pipeline
 This is a collection of functions and pipelines to download data useful to produce forecast for [Elia Predico platform](https://innovation.eliagroup.eu/en/projects/predico-collaborative-forecasting-platform).
 
 
