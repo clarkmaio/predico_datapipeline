@@ -21,7 +21,7 @@ def read_parquet(url: str):
 
 
 
-@retry(wait_random_min=3000, wait_random_max=5000)
+#@retry(wait_random_min=3000, wait_random_max=5000)
 def upload_dataframe_hf(df: pd.DataFrame, filename: str, subset_drop_duplicates: List[str] = None, concat: bool =False) -> None:
     '''
     Upload dataframe to huggingface dataset as raw file.
