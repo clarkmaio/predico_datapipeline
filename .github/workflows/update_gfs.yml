@@ -2,7 +2,8 @@ name: Update gfs
 
 on:
   schedule:
-    - cron: "0 6/11 * * *" 
+    - cron: "0 6,13 * * *" # Run run 00 and 06
+    - cron: "50 10 * * *" # Just before delivary time
   workflow_dispatch:
 
 jobs:
