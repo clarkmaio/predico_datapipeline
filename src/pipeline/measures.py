@@ -5,6 +5,7 @@ from datetime import datetime
 from tqdm import tqdm
 from huggingface_hub import login
 import os
+from loguru import logger
 
 from src.utils import upload_dataframe_hf
 
@@ -66,9 +67,14 @@ def MeasureRealtimePipeline():
    Pipeline to download real time measures and append to existing dataset
    '''
 
+   logger.info('Download realtime measures')
    df_live = load_realtime_measures()   
+
+   logger.info('Update target.parquet')
    login(token=os.getenv('HF_TOKEN'), write_permission=True)
    upload_dataframe_hf(df=df_live, filename='target.parquet', subset_drop_duplicates=['datetime'], concat=True)
+
+   logger.info('Done')
 
 
 if __name__ == '__main__':

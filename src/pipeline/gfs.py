@@ -11,6 +11,7 @@ from huggingface_hub import login
 from typing import List, Iterable
 from copy import deepcopy
 import s3fs
+from loguru import logger
 
 from src.utils import upload_dataframe_hf
 
@@ -109,8 +110,16 @@ def GfsLastrunPipeline():
     steps = list(range(0, MAX_STEP, 3))
 
     lastrundate, lastrun = deduce_gfs_lastrun()
+    logger.info(f'Download run {lastrundate.strftime("")} {lastrun}z')
     run_data = download_forecastrun(date=lastrundate, run=lastrun, steps=steps)
+
+    logger.info('Write gfs_lastrun.parquet')
     upload_dataframe_hf(df=run_data, filename='gfs_lastrun.parquet', concat=False)
+
+    logger.info('Update gfs_history.parquet')
+    upload_dataframe_hf(df=run_data, filename='gfs_history.parquet', concat=True)
+
+    logger.info('Done')
 
 
 
