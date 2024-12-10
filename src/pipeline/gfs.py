@@ -110,7 +110,7 @@ def GfsLastrunPipeline():
     steps = list(range(0, MAX_STEP, 3))
 
     lastrundate, lastrun = deduce_gfs_lastrun()
-    logger.info(f'Download run {lastrundate.strftime("")} {lastrun}z')
+    logger.info(f'Download run {lastrundate.strftime("%Y-%m-%d")} {lastrun}z')
     run_data = download_forecastrun(date=lastrundate, run=lastrun, steps=steps)
 
     logger.info('Write gfs_lastrun.parquet')
