@@ -113,6 +113,9 @@ def GfsLastrunPipeline():
     logger.info(f'Download run {lastrundate.strftime("%Y-%m-%d")} {lastrun}z')
     run_data = download_forecastrun(date=lastrundate, run=lastrun, steps=steps)
 
+
+    login(token=os.getenv('HF_TOKEN'), write_permission=True)
+
     logger.info('Write gfs_lastrun.parquet')
     upload_dataframe_hf(df=run_data, filename='gfs_lastrun.parquet', concat=False)
 
