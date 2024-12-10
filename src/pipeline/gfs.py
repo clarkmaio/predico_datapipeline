@@ -62,10 +62,10 @@ def download_forecastrun(date: datetime, run: str, steps: List[int]) -> pd.DataF
                 continue
 
             uri = uri_generator(forecastdate=date, run=run, step=step)
-            logger.info(uri)
             tmp = build_dataset(uri=uri)
             run_data.append(tmp)
         except Exception as e:
+            logger.warning(e)
             continue
 
     run_data = pd.concat(run_data, axis=0)
