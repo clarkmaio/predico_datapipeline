@@ -4,16 +4,17 @@ import fsspec
 from tqdm import tqdm
 from datetime import datetime
 import pandas as pd
-from typing import List
+from typing import List, Tuple
 from itertools import product
 import os
 from huggingface_hub import login
 from typing import List, Iterable
 from copy import deepcopy
+import s3fs
 
-from utils import upload_dataframe_hf
+from src.utils import upload_dataframe_hf
 
-
+MAX_STEP = 51
 
 def uri_generator(forecastdate: datetime, run: str, step: int) -> str:
     step_str = str(step).zfill(3)
@@ -48,33 +49,70 @@ def build_dataset(uri: str) -> pd.DataFrame:
     os.remove(file)
     return data
 
-
-
-
-def GfsPipeline(date_range: Iterable, runs: List[str] = ['00', '06'], steps: List[int] = list(range(0, 51, 3))):
+def download_forecastrun(date: datetime, run: str, steps: List[int]) -> pd.DataFrame:
     '''
+    Download data from a single forecastrun
+    '''
+
+    run_data = []
+    for step in steps:
+        try:
+            if (run == '06') and step > 42:
+                continue
+
+            uri = uri_generator(forecastdate=date, run=run, step=step)
+            tmp = build_dataset(uri=uri)
+            run_data.append(tmp)
+        except Exception as e:
+            continue
+
+    run_data = pd.concat(run_data, axis=0)
+    return run_data
+
+
+def deduce_gfs_lastrun() -> Tuple:
+    '''
+    Return last forecastdate and run available on aws
+    '''
+    fs = s3fs.S3FileSystem(anon=True)
+    folders = fs.ls('s3://noaa-gefs-pds/')
+    folders.sort()
+
+    lastrundate_path=folders[-2]
+    lastrundate = datetime.strptime(lastrundate_path.split('/')[-1].replace('gefs.', ''), '%Y%m%d')
+    lastrun_path = fs.ls(f's3://{lastrundate_path}')[-1]
+    lastrun = lastrun_path.split('/')[-1]
+    return lastrundate, lastrun
+
+def GfsHistoryPipeline(date_range: Iterable, runs: List[str] = ['00', '06'], steps: List[int] = list(range(0, MAX_STEP, 3))):
+    '''
+    Download historical weather data from aws
     '''
 
     PRODUCT = product(date_range, runs)
     LENGTH=len(list(deepcopy(PRODUCT)))
     
-    login(token=SECRET['HF_TOKEN'], write_permission=True)
+    login(token=os.getenv('HF_TOKEN'), write_permission=True)
 
 
     pbar = tqdm(PRODUCT, total=LENGTH) 
     for (d, run) in pbar: 
-        run_data = []
-        for step in steps:
-            pbar.set_postfix_str(f'{d} {run} {step}')
-            try:
-                if (run == '06') and step > 42:
-                    continue
-
-                uri = uri_generator(forecastdate=d, run=run, step=step)
-                tmp = build_dataset(uri=uri)
-                run_data.append(tmp)
-            except Exception as e:
-                continue
-    
-        run_data = pd.concat(run_data, axis=0)
+        pbar.set_postfix_str(f'{d} {run}')  
+        run_data = download_forecastrun(date=d, run=run, steps=steps)
         upload_dataframe_hf(df=run_data, filename='gfs_history.parquet', concat=True)
+
+
+def GfsLastrunPipeline():
+    '''
+    Download last run available from gfs bucket and upload on huggingface
+    '''
+    steps = list(range(0, MAX_STEP, 3))
+
+    lastrundate, lastrun = deduce_gfs_lastrun()
+    run_data = download_forecastrun(date=lastrundate, run=lastrun, steps=steps)
+    upload_dataframe_hf(df=run_data, filename='gfs_lastrun.parquet', concat=False)
+
+
+
+if __name__ == '__main__':
+    GfsLastrunPipeline()
