@@ -25,3 +25,8 @@ This is a collection of functions and pipelines to download data useful to produ
 <img src = "https://raw.githubusercontent.com/clarkmaio/predico_datapipeline/refs/heads/main/assets/predico_datapipeline_workflow.png" style="width:1000px;">
 
 
+## Roadmap
+* ✅ Gfs 0.25° ens mean
+* ❌ Ecmwf, Gfs 0.25° ens
+* ❌ TSO power demand and PV forecast
+* ❌ Ecmwf, Gfs AI
