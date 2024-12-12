@@ -1,0 +1,5 @@
+.vscode
+.secret
+.env
+*.pyc
+**/__pycache__

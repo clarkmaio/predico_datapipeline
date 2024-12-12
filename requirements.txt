@@ -1,0 +1,11 @@
+polars
+pandas
+tqdm
+huggingface_hub
+fsspec
+s3fs
+xarray
+retrying
+pyarrow
+loguru
+cfgrib
