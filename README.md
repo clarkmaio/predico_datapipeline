@@ -27,6 +27,6 @@ This is a collection of functions and pipelines to download data useful to produ
 
 ## Roadmap
 * ✅ Gfs 0.25° ens mean
-* ❌ TSO power demand and PV forecast
+* ❌ Elia power demand and PV forecast
 * ❌ Gfs 0.25° ens
 * ❌ Ecmwf Ifs & Ecmwf AI
