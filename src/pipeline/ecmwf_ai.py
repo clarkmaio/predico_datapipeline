@@ -121,7 +121,7 @@ def EcmwfAiLastrunPipeline():
     login(token=os.getenv('HF_TOKEN'), write_permission=True)
 
     logger.info('Write ecmwf_lastrun.parquet')
-    upload_dataframe_hf(df=run_data, filename='ecmwf_lastrun.parquet', concat=False)
+    upload_dataframe_hf(df=run_data, filename='ecmwf_ai_lastrun.parquet', concat=False)
 
     logger.info('Update ecmwf_history.parquet')
     upload_dataframe_hf(df=run_data, filename='ecmwf_ai_history.parquet', concat=True)
