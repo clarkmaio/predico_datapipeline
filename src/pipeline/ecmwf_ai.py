@@ -13,9 +13,6 @@ from copy import deepcopy
 import s3fs
 from loguru import logger
 
-from dotenv import load_dotenv
-load_dotenv()
-
 from src.utils import upload_dataframe_hf
 
 MAX_STEP = 6 #51
