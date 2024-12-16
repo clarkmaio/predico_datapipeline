@@ -15,7 +15,7 @@ from loguru import logger
 
 from src.utils import upload_dataframe_hf
 
-MAX_STEP = 6 #51
+MAX_STEP = 51
 ONSHORE_BOX={'latitude': (51.5, 49.5), 'longitude': (2.5, 6.5)}
 OFFSHORE_BOX={'latitude': (), 'longitude': ()}
 
