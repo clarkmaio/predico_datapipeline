@@ -1,4 +1,4 @@
-name: Update ecmwf
+name: Update ecmwf ai
 
 on:
   schedule:
