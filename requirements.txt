@@ -9,3 +9,4 @@ retrying
 pyarrow
 loguru
 cfgrib
+dotenv

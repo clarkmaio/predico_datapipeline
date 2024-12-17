@@ -2,7 +2,7 @@
 import xarray as xr
 import fsspec
 from tqdm import tqdm
-from datetime import datetime
+from datetime import datetime, timedelta
 import pandas as pd
 from typing import List, Tuple
 from itertools import product
@@ -13,14 +13,9 @@ from copy import deepcopy
 import s3fs
 from loguru import logger
 
-from dotenv import load_dotenv
-load_dotenv()
-
 from src.utils import upload_dataframe_hf
 
-MAX_STEP = 6 #51
-ONSHORE_BOX={'latitude': (51.5, 49.5), 'longitude': (2.5, 6.5)}
-OFFSHORE_BOX={'latitude': (), 'longitude': ()}
+MAX_STEP = 51 #51
 
 def uri_generator(forecastdate: datetime, run: str, step: int) -> str:
     frun_str = forecastdate.strftime("%Y%m%d")
@@ -40,17 +35,7 @@ def build_dataset(uri: str) -> pd.DataFrame:
     m10.reset_index(inplace=True)
     m10.drop('heightAboveGround', axis=1, errors='ignore', inplace=True)
 
-    # 100m variables
-    m100 = xr.open_dataset(file, 
-                     engine="cfgrib", 
-                     filter_by_keys={'typeOfLevel': 'heightAboveGround', 'level': 100}
-                     )
-    m100 = m100.sel(latitude=slice(51.5, 49.5), longitude=slice(2.5, 6.5)).to_dataframe()
-    m100.reset_index(inplace=True)
-    m100.drop('heightAboveGround', axis=1, errors='ignore', inplace=True)
-
-    data = pd.merge(m10, m100, on=['latitude', 'longitude', 'valid_time', 'step', 'time'])
-
+    data = m10.copy()
     os.remove(file)
     return data
 
@@ -69,14 +54,14 @@ def download_forecastrun(date: datetime, run: str, steps: List[int]) -> pd.DataF
             tmp = build_dataset(uri=uri)
             run_data.append(tmp)
         except Exception as e:
-            logger.warning(e)
+            logger.warning(f'{date} {run}z step {step}: {e}')
             continue
 
     run_data = pd.concat(run_data, axis=0)
     return run_data
 
 
-def deduce_ecmwf_lastrun() -> Tuple:
+def deduce_ecmwf_ai_lastrun() -> Tuple:
     '''
     Return last forecastdate and run available on aws
     '''
@@ -84,11 +69,18 @@ def deduce_ecmwf_lastrun() -> Tuple:
     folders = fs.ls('s3://ecmwf-forecasts/')
     folders.sort()
 
-    lastrundate_path=folders[-4]
-    lastrundate = datetime.strptime(lastrundate_path.split('/')[-1], '%Y%m%d')
-    lastrun_path = fs.ls(f's3://{lastrundate_path}')[-1]
-    lastrun = lastrun_path.split('/')[-1].replace('z', '')
-    return lastrundate, lastrun
+    search_runs = ['18', '12', '06', '00']
+    search_fdate = [datetime.now().strftime('%Y%m%d'), (datetime.now()-timedelta(days=1)).strftime('%Y%m%d')]
+    for fd in search_fdate:
+        for r in search_runs:
+            if fs.exists(f's3://ecmwf-forecasts/{fd}/{r}z/aifs/0p25/oper'):
+                lastrundate = datetime.strptime(fd, '%Y%m%d')
+                lastrun = r
+                return lastrundate, lastrun
+            else:
+                logger.warning(f'Run not {fd} {r} not available')
+
+    logger.error('No run available since 2 days')
 
 def EcmwfAiHistoryPipeline(date_range: Iterable, runs: List[str] = ['00', '06'], steps: List[int] = list(range(0, MAX_STEP, 3))):
     '''
@@ -114,16 +106,16 @@ def EcmwfAiLastrunPipeline():
     '''
     steps = list(range(0, MAX_STEP, 3))
 
-    lastrundate, lastrun = deduce_ecmwf_lastrun()
+    lastrundate, lastrun = deduce_ecmwf_ai_lastrun()
     logger.info(f'Download run {lastrundate.strftime("%Y-%m-%d")} {lastrun}z')
     run_data = download_forecastrun(date=lastrundate, run=lastrun, steps=steps)
 
     login(token=os.getenv('HF_TOKEN'), write_permission=True)
 
-    logger.info('Write ecmwf_lastrun.parquet')
-    upload_dataframe_hf(df=run_data, filename='ecmwf_lastrun.parquet', concat=False)
+    logger.info('Write ecmwf_ai_lastrun.parquet')
+    upload_dataframe_hf(df=run_data, filename='ecmwf_ai_lastrun.parquet', concat=False)
 
-    logger.info('Update ecmwf_history.parquet')
+    logger.info('Update ecmwf_ai_history.parquet')
     upload_dataframe_hf(df=run_data, filename='ecmwf_ai_history.parquet', concat=True)
 
     logger.info('Done')
