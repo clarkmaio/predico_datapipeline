@@ -9,4 +9,4 @@ retrying
 pyarrow
 loguru
 cfgrib
-dotenv
+python-dotenv
