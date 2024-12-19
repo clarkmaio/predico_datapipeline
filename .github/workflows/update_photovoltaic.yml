@@ -24,6 +24,6 @@ jobs:
           
       - name: Run PhotovoltaicRealtimePipeline
         run: |
-          python -c "from src.pipeline.measures import PhotovoltaicRealtimePipeline; PhotovoltaicRealtimePipeline()"
+          python -c "from src.pipeline.photovoltaic import PhotovoltaicRealtimePipeline; PhotovoltaicRealtimePipeline()"
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
