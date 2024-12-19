@@ -118,10 +118,10 @@ def EcmwfLastrunPipeline():
     login(token=os.getenv('HF_TOKEN'), write_permission=True)
 
     logger.info('Write ecmwf_lastrun.parquet')
-    upload_dataframe_hf(df=run_data, filename='ecmwf_lastrun.parquet', concat=False)
+    upload_dataframe_hf(df=run_data, filename='weather/ecmwf_lastrun.parquet', concat=False)
 
     logger.info('Update ecmwf_history.parquet')
-    upload_dataframe_hf(df=run_data, filename='ecmwf_history.parquet', concat=True)
+    upload_dataframe_hf(df=run_data, filename='weather/ecmwf_history.parquet', concat=True)
 
     logger.info('Done')
 

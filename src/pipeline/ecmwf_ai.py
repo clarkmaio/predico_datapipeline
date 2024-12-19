@@ -78,7 +78,7 @@ def deduce_ecmwf_ai_lastrun() -> Tuple:
                 lastrun = r
                 return lastrundate, lastrun
             else:
-                logger.warning(f'Run not {fd} {r} not available')
+                logger.warning(f'Run {fd} {r} not available')
 
     logger.error('No run available since 2 days')
 
@@ -113,10 +113,10 @@ def EcmwfAiLastrunPipeline():
     login(token=os.getenv('HF_TOKEN'), write_permission=True)
 
     logger.info('Write ecmwf_ai_lastrun.parquet')
-    upload_dataframe_hf(df=run_data, filename='ecmwf_ai_lastrun.parquet', concat=False)
+    upload_dataframe_hf(df=run_data, filename='weather/ecmwf_ai_lastrun.parquet', concat=False)
 
     logger.info('Update ecmwf_ai_history.parquet')
-    upload_dataframe_hf(df=run_data, filename='ecmwf_ai_history.parquet', concat=True)
+    upload_dataframe_hf(df=run_data, filename='weather/ecmwf_ai_history.parquet', concat=True)
 
     logger.info('Done')
 

@@ -118,10 +118,10 @@ def GfsLastrunPipeline():
     login(token=os.getenv('HF_TOKEN'), write_permission=True)
 
     logger.info('Write gfs_lastrun.parquet')
-    upload_dataframe_hf(df=run_data, filename='gfs_lastrun.parquet', concat=False)
+    upload_dataframe_hf(df=run_data, filename='weather/gfs_lastrun.parquet', concat=False)
 
     logger.info('Update gfs_history.parquet')
-    upload_dataframe_hf(df=run_data, filename='gfs_history.parquet', concat=True)
+    upload_dataframe_hf(df=run_data, filename='weather/gfs_history.parquet', concat=True)
 
     logger.info('Done')
 
