@@ -118,7 +118,7 @@ def EcmwfLastrunPipeline():
     logger.info(f'Download run {lastrundate.strftime("%Y-%m-%d")} {lastrun}z')
     run_data = download_forecastrun(date=lastrundate, run=lastrun, steps=steps)
 
-    if run_data.empty():
+    if run_data.empty:
         logger.info('Empty data. Doing nothing')
         return
 
