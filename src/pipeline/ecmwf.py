@@ -68,7 +68,10 @@ def download_forecastrun(date: datetime, run: str, steps: List[int]) -> pd.DataF
         except Exception as e:
             logger.warning(e)
             continue
-
+            
+    if len(run_data)==0:
+        return pd.DataFrame()
+        
     run_data = pd.concat(run_data, axis=0)
     return run_data
 
@@ -114,6 +117,11 @@ def EcmwfLastrunPipeline():
     lastrundate, lastrun = deduce_ecmwf_lastrun()
     logger.info(f'Download run {lastrundate.strftime("%Y-%m-%d")} {lastrun}z')
     run_data = download_forecastrun(date=lastrundate, run=lastrun, steps=steps)
+
+    if run_data.empty():
+        logger.info('Empty data. Doing nothing')
+        return
+
 
     login(token=os.getenv('HF_TOKEN'), write_permission=True)
 
