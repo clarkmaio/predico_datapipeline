@@ -32,7 +32,7 @@ def build_dataset(uri: str) -> pd.DataFrame:
                      engine="cfgrib", 
                      filter_by_keys={'typeOfLevel': 'heightAboveGround', 'level': 10}
                      )
-    m10 = m10.sel(latitude=slice(*CONSTANTS['PERIMETER']['LATITUDE']), longitude=slice(*CONTANTS['PERIMETER']['LONGITUDE'])).to_dataframe()
+    m10 = m10.sel(latitude=slice(*CONSTANTS['PERIMETER']['LATITUDE']), longitude=slice(*CONSTANTS['PERIMETER']['LONGITUDE'])).to_dataframe()
     m10.reset_index(inplace=True)
 
 
@@ -42,7 +42,7 @@ def build_dataset(uri: str) -> pd.DataFrame:
                      filter_by_keys={'typeOfLevel': 'surface'}
                      )
 
-    surface = surface.sel(latitude=slice(*CONSTANTS['PERIMETER']['LATITUDE']), longitude=slice(*CONTANTS['PERIMETER']['LONGITUDE']))
+    surface = surface.sel(latitude=slice(*CONSTANTS['PERIMETER']['LATITUDE']), longitude=slice(*CONSTANTS['PERIMETER']['LONGITUDE']))
     surface = surface[['gust', 'cape']].to_dataframe()
     surface.reset_index(inplace=True)
 
@@ -87,7 +87,7 @@ def deduce_gfs_lastrun() -> Tuple:
     lastrun = lastrun_path.split('/')[-1]
     return lastrundate, lastrun
 
-def GfsHistoryPipeline(date_range: Iterable, runs: List[str] = ['00', '06'], steps: List[int] = list(range(0, CONTANTS['MAX_STEP'], 3))):
+def GfsHistoryPipeline(date_range: Iterable, runs: List[str] = ['00', '06'], steps: List[int] = list(range(0, CONSTANTS['MAX_STEP'], 3))):
     '''
     Download historical weather data from aws
     '''
@@ -109,7 +109,7 @@ def GfsLastrunPipeline():
     '''
     Download last run available from gfs bucket and upload on huggingface
     '''
-    steps = list(range(0, CONTANTS['MAX_STEP'], 3))
+    steps = list(range(0, CONSTANTS['MAX_STEP'], 3))
 
     lastrundate, lastrun = deduce_gfs_lastrun()
     logger.info(f'Download run {lastrundate.strftime("%Y-%m-%d")} {lastrun}z')
