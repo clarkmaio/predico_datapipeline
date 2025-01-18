@@ -98,7 +98,7 @@ def EcmwfAiHistoryPipeline(date_range: Iterable, runs: List[str] = ['00', '06'],
     for (d, run) in pbar: 
         pbar.set_postfix_str(f'{d} {run}')  
         run_data = download_forecastrun(date=d, run=run, steps=steps)
-        upload_dataframe_hf(df=run_data, filename='ecmwf_ai_history.parquet', concat=True)
+        upload_dataframe_hf(df=run_data, filename='weather/ecmwf_ai_history.parquet', concat=True)
 
 
 def EcmwfAiLastrunPipeline():

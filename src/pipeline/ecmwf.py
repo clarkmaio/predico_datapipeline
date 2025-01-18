@@ -105,7 +105,7 @@ def EcmwfHistoryPipeline(date_range: Iterable, runs: List[str] = ['00', '06'], s
     for (d, run) in pbar: 
         pbar.set_postfix_str(f'{d} {run}')  
         run_data = download_forecastrun(date=d, run=run, steps=steps)
-        upload_dataframe_hf(df=run_data, filename='ecmwf_history.parquet', concat=True)
+        upload_dataframe_hf(df=run_data, filename='weather/ecmwf_history.parquet', concat=True)
 
 
 def EcmwfLastrunPipeline():
@@ -136,4 +136,8 @@ def EcmwfLastrunPipeline():
 
 
 if __name__ == '__main__':
-    EcmwfLastrunPipeline()
+
+    start= datetime(2024, 2, 1)
+    end = datetime(2024, 2, 28) # datetime.now()
+    date_range = pd.date_range(start=start, end=end, freq='d')
+    EcmwfHistoryPipeline(date_range=date_range)
