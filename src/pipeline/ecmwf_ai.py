@@ -12,10 +12,11 @@ from typing import List, Iterable
 from copy import deepcopy
 import s3fs
 from loguru import logger
+from envyaml import EnvYAML
 
 from src.utils import upload_dataframe_hf
 
-MAX_STEP = 51 #51
+CONSTANTS = EnvYAML('constants.yml')
 
 def uri_generator(forecastdate: datetime, run: str, step: int) -> str:
     frun_str = forecastdate.strftime("%Y%m%d")
@@ -31,7 +32,7 @@ def build_dataset(uri: str) -> pd.DataFrame:
                      engine="cfgrib", 
                      filter_by_keys={'typeOfLevel': 'heightAboveGround', 'level': 10}
                      )
-    m10 = m10.sel(latitude=slice(51.5, 49.5), longitude=slice(2.5, 6.5)).to_dataframe()
+    m10 = m10.sel(latitude=slice(*CONSTANTS['PERIMETER']['LATITUDE']), longitude=slice(*CONSTANTS['PERIMETER']['LONGITUDE'])).to_dataframe()
     m10.reset_index(inplace=True)
     m10.drop('heightAboveGround', axis=1, errors='ignore', inplace=True)
 
@@ -82,7 +83,7 @@ def deduce_ecmwf_ai_lastrun() -> Tuple:
 
     logger.error('No run available since 2 days')
 
-def EcmwfAiHistoryPipeline(date_range: Iterable, runs: List[str] = ['00', '06'], steps: List[int] = list(range(0, MAX_STEP, 3))):
+def EcmwfAiHistoryPipeline(date_range: Iterable, runs: List[str] = ['00', '06'], steps: List[int] = list(range(0, CONSTANTS['MAX_STEP'], 3))):
     '''
     Download historical weather data from aws
     '''
@@ -104,7 +105,7 @@ def EcmwfAiLastrunPipeline():
     '''
     Download last run available from ecmwf bucket and upload on huggingface
     '''
-    steps = list(range(0, MAX_STEP, 3))
+    steps = list(range(0, CONSTANTS['MAX_STEP'], 3))
 
     lastrundate, lastrun = deduce_ecmwf_ai_lastrun()
     logger.info(f'Download run {lastrundate.strftime("%Y-%m-%d")} {lastrun}z')

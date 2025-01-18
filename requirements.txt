@@ -10,3 +10,4 @@ pyarrow
 loguru
 cfgrib
 python-dotenv
+envyaml
